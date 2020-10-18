@@ -1,20 +1,3 @@
-;; local definitions of functions from various modules
-
-(local tan math.tan)
-(local sqrt math.sqrt)
-(local cos math.cos)
-(local sin math.sin)
-(local abs math.abs)
-(local max math.max)
-
-;; LÖVE stuff
-
-(local love-points love.graphics.points)
-(local love-dimensions love.graphics.getDimensions)
-(local love-set-color love.graphics.setColor)
-(local love-key-pressed? love.keyboard.isDown)
-(local love-get-joysticks love.joystick.getJoysticks)
-
 ;; global parameters and constants
 
 (local RAD (/ math.pi 180.0))
@@ -42,7 +25,7 @@
       [x y (or z 0)]))
 
 (fn vec-length [[x y z]]
-  (sqrt (+ (^ x 2) (^ y 2) (^ z 2))))
+  (math.sqrt (+ (^ x 2) (^ y 2) (^ z 2))))
 
 (fn vec-sub [[x0 y0 z0] [x1 y1 z1]]
   [(- x0 x1) (- y0 y1) (- z0 z1)])
@@ -75,10 +58,10 @@
         z (- z az)
         x-angle (* x-angle RAD)
         z-angle (* z-angle RAD)
-        cos-x (cos x-angle)
-        sin-x (sin x-angle)
-        cos-z (cos z-angle)
-        sin-z (sin z-angle)]
+        cos-x (math.cos x-angle)
+        sin-x (math.sin x-angle)
+        cos-z (math.cos z-angle)
+        sin-z (math.sin z-angle)]
     [(+ (* cos-x cos-z x) (* (- sin-x) y) (* cos-x sin-z z) ax)
      (+ (* sin-x cos-z x) (* cos-x y) (- (* sin-x sin-z z)) ay)
      (+ (* (- sin-z) x) (* cos-z z) az)]))
@@ -88,9 +71,9 @@
 (fn box-distance [{:pos [box-x box-y box-z]
                    :dimensions [x-side y-side z-side]}
                   [x y z]]
-  (sqrt (+ (^ (max 0 (- (abs (- box-x x)) (/ x-side 2))) 2)
-           (^ (max 0 (- (abs (- box-y y)) (/ y-side 2))) 2)
-           (^ (max 0 (- (abs (- box-z z)) (/ z-side 2))) 2))))
+  (math.sqrt (+ (^ (math.max 0 (- (math.abs (- box-x x)) (/ x-side 2))) 2)
+           (^ (math.max 0 (- (math.abs (- box-y y)) (/ y-side 2))) 2)
+           (^ (math.max 0 (- (math.abs (- box-z z)) (/ z-side 2))) 2))))
 
 (fn box [sides pos color]
   (let [[x y z] (or pos [0 0 0])
@@ -104,7 +87,7 @@
      :sdf box-distance}))
 
 (fn sphere-distance [{:pos [sx sy sz] : radius} [x y z]]
-  (- (sqrt (+ (^ (- sx x) 2) (^ (- sy y) 2) (^ (- sz z) 2)))
+  (- (math.sqrt (+ (^ (- sx x) 2) (^ (- sy y) 2) (^ (- sz z) 2)))
      radius))
 
 (fn sphere [radius pos color]
@@ -137,10 +120,7 @@
   (vec-add point (vec-mul dir (vec3 distance))))
 
 (fn march-ray [origin direction scene]
-  (var steps 0)
-  (var distance 0)
-  (var color nil)
-
+  (var [steps distance color] [0 0 nil])
   (var not-done? true)
   (while not-done?
     (let [(new-distance
@@ -224,9 +204,9 @@
 (fn move-light []
   (set light (rotate-point light [0 0 0] 1 0)))
 
-(var camera {:pos [20 50 20]
-             :x-rotate 255
-             :z-rotate 15})
+(local camera {:pos [20 50 20]
+               :x-rotate 255
+               :z-rotate 15})
 
 (fn forward-vec [camera]
   (let [pos camera.pos]
@@ -262,8 +242,8 @@
 ;; drawing
 
 (fn love.draw []
-  (let [(width height) (love-dimensions)
-        projection-distance (/ 1 (tan (* (/ fov 2) RAD)))
+  (let [(width height) (love.graphics.getDimensions)
+        projection-distance (/ 1 (math.tan (* (/ fov 2) RAD)))
         ro camera.pos
         lookat (forward-vec camera)
         f (norm (vec-sub lookat ro))
@@ -281,9 +261,9 @@
               (distance color) (march-ray ro rd scene)]
           (if (< distance DRAW-DISTANCE)
               (let [point (move-point ro rd distance)]
-                (love-set-color (shade-point point rd color scene light)))
-              (love-set-color scene.env-color))
-          (love-points x y))))))
+                (love.graphics.setColor (shade-point point rd color scene light)))
+              (love.graphics.setColor scene.env-color))
+          (love.graphics.points x y))))))
 
 ;; user input
 
@@ -322,24 +302,24 @@
           r1 (inc-reflections 1)))))
 
 (fn handle-keyboard-input []
-  (if (love-key-pressed? "w") (camera-forward 1)
-      (love-key-pressed? "s") (camera-forward -1))
-  (if (love-key-pressed? "d")
-      (if (love-key-pressed? "lshift")
+  (if (love.keyboard.isDown "w") (camera-forward 1)
+      (love.keyboard.isDown "s") (camera-forward -1))
+  (if (love.keyboard.isDown "d")
+      (if (love.keyboard.isDown "lshift")
           (camera-strafe 1)
           (camera-rotate-x 1))
-      (love-key-pressed? "a")
-      (if (love-key-pressed? "lshift")
+      (love.keyboard.isDown "a")
+      (if (love.keyboard.isDown "lshift")
           (camera-strafe -1)
           (camera-rotate-x -1)))
-  (if (love-key-pressed? "q") (camera-rotate-z 1)
-      (love-key-pressed? "e") (camera-rotate-z -1))
-  (if (love-key-pressed? "r") (camera-elevate 1)
-      (love-key-pressed? "f") (camera-elevate -1))
-  (if (love-key-pressed? "o") (inc-fov 1)
-      (love-key-pressed? "p") (inc-fov -1))
-  (if (love-key-pressed? "k") (inc-reflections 1)
-      (love-key-pressed? "l") (inc-reflections -1)))
+  (if (love.keyboard.isDown "q") (camera-rotate-z 1)
+      (love.keyboard.isDown "e") (camera-rotate-z -1))
+  (if (love.keyboard.isDown "r") (camera-elevate 1)
+      (love.keyboard.isDown "f") (camera-elevate -1))
+  (if (love.keyboard.isDown "o") (inc-fov 1)
+      (love.keyboard.isDown "p") (inc-fov -1))
+  (if (love.keyboard.isDown "k") (inc-reflections 1)
+      (love.keyboard.isDown "l") (inc-reflections -1)))
 
 (fn love.update [dt]
   (move-light light)
