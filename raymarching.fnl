@@ -9,13 +9,13 @@
 
 ;; window properties & initialization
 
-(local window-width 512)
-(local window-height 448)
-(local window-flags {:resizable true :vsync false :minwidth 256 :minheight 224})
+(local WINDOW-WIDTH 512)
+(local WINDOW-HEIGHT 448)
+(local WINDOW-FLAGS {:resizable true :vsync false :minwidth 256 :minheight 224})
 
 (fn love.load []
   (love.window.setTitle "LÖVE Raymarching")
-  (love.window.setMode window-width window-height window-flags))
+  (love.window.setMode WINDOW-WIDTH WINDOW-HEIGHT WINDOW-FLAGS))
 
 ;; vector functions
 
@@ -113,7 +113,7 @@
     (let [distance (object:sdf point)]
       (when (< distance min)
         (set min distance)
-        (set color (. object :color)))))
+        (set color object.color))))
   (values min color))
 
 (fn move-point [point dir distance]

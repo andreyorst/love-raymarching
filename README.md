@@ -4,11 +4,6 @@ It was built against LÖVE 11.3 and Fennel 0.6.0 on Lua 5.3.
 
 ![screenshot][4]
 
-## Build
-Simply run this command:
-
-    $ fennel --compile main.fnl > main.lua
-
 ## Run
 Execute `love .` in the root directory of the project.
 
