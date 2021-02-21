@@ -72,8 +72,8 @@
                    :dimensions [x-side y-side z-side]}
                   [x y z]]
   (math.sqrt (+ (^ (math.max 0 (- (math.abs (- box-x x)) (/ x-side 2))) 2)
-           (^ (math.max 0 (- (math.abs (- box-y y)) (/ y-side 2))) 2)
-           (^ (math.max 0 (- (math.abs (- box-z z)) (/ z-side 2))) 2))))
+                (^ (math.max 0 (- (math.abs (- box-y y)) (/ y-side 2))) 2)
+                (^ (math.max 0 (- (math.abs (- box-z z)) (/ z-side 2))) 2))))
 
 (fn box [sides pos color]
   (let [[x y z] (or pos [0 0 0])
@@ -274,16 +274,16 @@
 
 (fn handle-controller []
   (when gamepad
-    (let [lstick-x  (gamepad:getGamepadAxis "leftx")
-          lstick-y  (gamepad:getGamepadAxis "lefty")
-          l2        (gamepad:getGamepadAxis "triggerleft")
-          rstick-x  (gamepad:getGamepadAxis "rightx")
-          rstick-y  (gamepad:getGamepadAxis "righty")
-          r2        (gamepad:getGamepadAxis "triggerright")
-          up        (gamepad:isGamepadDown  "dpup")
-          down      (gamepad:isGamepadDown  "dpdown")
-          l1        (gamepad:isGamepadDown  "leftshoulder")
-          r1        (gamepad:isGamepadDown  "rightshoulder")]
+    (let [lstick-x  (gamepad:getGamepadAxis :leftx)
+          lstick-y  (gamepad:getGamepadAxis :lefty)
+          l2        (gamepad:getGamepadAxis :triggerleft)
+          rstick-x  (gamepad:getGamepadAxis :rightx)
+          rstick-y  (gamepad:getGamepadAxis :righty)
+          r2        (gamepad:getGamepadAxis :triggerright)
+          up        (gamepad:isGamepadDown  :dpup)
+          down      (gamepad:isGamepadDown  :dpdown)
+          l1        (gamepad:isGamepadDown  :leftshoulder)
+          r1        (gamepad:isGamepadDown  :rightshoulder)]
       (when (and lstick-y (or (< lstick-y -0.2) (> lstick-y 0.2)))
         (camera-forward (* 2 (- lstick-y))))
       (when (and lstick-x (or (< lstick-x -0.2) (> lstick-x 0.2)))
@@ -302,26 +302,28 @@
           r1 (inc-reflections 1)))))
 
 (fn handle-keyboard-input []
-  (if (love.keyboard.isDown "w") (camera-forward 1)
-      (love.keyboard.isDown "s") (camera-forward -1))
-  (if (love.keyboard.isDown "d")
-      (if (love.keyboard.isDown "lshift")
+  (if (love.keyboard.isDown :w) (camera-forward 1)
+      (love.keyboard.isDown :s) (camera-forward -1))
+  (if (love.keyboard.isDown :d)
+      (if (love.keyboard.isDown :lshift)
           (camera-strafe 1)
           (camera-rotate-x 1))
-      (love.keyboard.isDown "a")
-      (if (love.keyboard.isDown "lshift")
+      (love.keyboard.isDown :a)
+      (if (love.keyboard.isDown :lshift)
           (camera-strafe -1)
           (camera-rotate-x -1)))
-  (if (love.keyboard.isDown "q") (camera-rotate-z 1)
-      (love.keyboard.isDown "e") (camera-rotate-z -1))
-  (if (love.keyboard.isDown "r") (camera-elevate 1)
-      (love.keyboard.isDown "f") (camera-elevate -1))
-  (if (love.keyboard.isDown "o") (inc-fov 1)
-      (love.keyboard.isDown "p") (inc-fov -1))
-  (if (love.keyboard.isDown "k") (inc-reflections 1)
-      (love.keyboard.isDown "l") (inc-reflections -1)))
+  (if (love.keyboard.isDown :q) (camera-rotate-z 1)
+      (love.keyboard.isDown :e) (camera-rotate-z -1))
+  (if (love.keyboard.isDown :r) (camera-elevate 1)
+      (love.keyboard.isDown :f) (camera-elevate -1))
+  (if (love.keyboard.isDown :o) (inc-fov 1)
+      (love.keyboard.isDown :p) (inc-fov -1))
+  (if (love.keyboard.isDown :k) (inc-reflections 1)
+      (love.keyboard.isDown :l) (inc-reflections -1)))
 
 (fn love.update [dt]
   (move-light light)
   (handle-keyboard-input)
   (handle-controller))
+
+;; LocalWords:  LÖVE Raymarching
